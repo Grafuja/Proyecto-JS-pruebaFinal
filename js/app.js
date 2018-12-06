@@ -1,130 +1,77 @@
-function calculadora() {
-  "use strict";
-    // Shortcut to get elements
-    var el = function(element) {
-      if (element.charAt(0) === "id") { // If passed an ID...
-        return document.querySelector(element); // ... returns single element
-      }
+function calculadora(){
+  Memoria  = "0";      // initialise Memoria variable
+  Actual = "0";      //   and value of Display ("Actual" value)
+  Operacion = 0;      // Records code for eg * / etc.
+  MAXLENGTH = 30;     // maximum number of digits before decimal!
 
-      return document.querySelectorAll(element); // Otherwise, returns a nodelist
+  function AddDigito(dig)   {
+    if (Actual.length > MAXLENGTH)
+         { Actual = "Aargh! Muy Largo"; //limit length
+         } else {
+           if (    (eval(Actual) == 0)
+                && (Actual.indexOf(".") == -1)
+              )
+             { Actual = dig;
+             } else {
+               Actual = Actual + dig;
+             };
+      };
     };
-  var display = el("#display"), // Calculator screen where result is displayed
-    igual = el("#igual"), // Equal button
-    on = el("#on"),//borrar pantalla
-    nums = el(".num"), // List of numbers
-    sum = el(".suma"), //operar suma
-    resta = el(".resta"),//operador resta
-    mult = el(".multiplica"),//operador multiplicador
-    divide = el(".divide"),//operador división
-    theNum = "", // Current number
-    oldNum = "", // First number
-    resultNum, // Result
-    operator,
-    tecla;
+     document.calculadora.display.value = Actual;
 
-
-  var setNum = function() {
-    if (resultNum) { // If a result was displayed, reset number
-      theNum = this.getAttribute("id");
-      resultNum = "";
-    } else { // Otherwise, add digit to previous number (this is a string!)
-      theNum += this.getAttribute("id");
-    }
-    display.innerHTML = theNum; // Display current number
-
-  };
-
-  var moveNum = function() {
-    oldNum = theNum;
-    theNum = "";
-    operator = this.getAttribute("id");
-
-    igual.setAttribute("id", igual.value);
-
-
-
-  };
-
-  var displayNum = function() {
-
-    // Convert string input to numbers
-    oldNum = parseFloat(oldNum);
-    theNum = parseFloat(theNum);
-
-    // Operaciones
-    switch (operator) {
-      case "suma":
-        resultNum = oldNum + theNum;
-        break;
-
-      case "resta":
-        resultNum = oldNum - theNum;
-        break;
-
-      case "mult":
-        resultNum = oldNum * theNum;
-        break;
-
-      case "divide":
-        resultNum = oldNum / theNum;
-        break;
-
-        // If equal is pressed without an operator, keep number and continue
-      default:
-        resultNum = theNum;
+   function Dot()                  //PUT IN "." if appropriate.
+    {
+     if ( Actual.length == 0)     //no leading ".", use "0."
+       { Actual = "0.";
+       } else
+       {  if ( Actual.indexOf(".") == -1)
+            { Actual = Actual + ".";
+       };   };
+     document.calculadora.display.value = Actual;
     }
 
-    // If NaN or Infinity returned
-    if (!isFinite(resultNum)) {
-      if (isNaN(resultNum)) { // If result is not a number; set off by, eg, double-clicking operators
-        resultNum = "Rompiste la Calculadora!";
-      } else { // If result is infinity, set off by dividing by zero
-        resultNum = "Eso no se hace!";
-      }
-    }
-
-    // Display result, finally!
-    display.innerHTML = resultNum;
-    igual.setAttribute("id", resultNum);
-
-    // Now reset oldNum & keep result
-    oldNum = 0;
-    theNum = resultNum;
-
-  };
-
-  // When: Clear button is pressed. Clear everything
-  var clearAll = function() {
-    oldNum = "";
-    theNum = "";
-    display.innerHTML = "0";
-  };
-
-  /* The click events */
-
-  function mouseClick() {
-    var teclaP = "";
-    teclaP.style.height = "4px";
-  }
-
-  // Add click event to numbers
-
- var tecla = document.getElementsByClassName("tecla");
-
- var clicked = function() {
-     var id = this.getAttribute("id");
- };
-
- for (var i = 0; i < tecla.length; i++) {
-     tecla[i].onclick = moveNum;
+    function Clear()                //CLEAR ENTRY
+ { Actual = "0";
+   document.calculadora.display.value = Actual;
  }
 
-  // Add click event to equal sign
-  igual.onclick = displayNum;
+function AllClear()             //Clear ALL entries!
+ { Actual = "0";
+   Operacion = 0;                //clear Operacion
+   Memoria = "0";                  //clear Memoria
+   document.calculadora.display.value = Actual;
+ }
 
-  // Add click event to clear button
-  el("#on").onclick = clearAll;
+ function Operate(op)            //STORE Operacion e.g. + * / etc.
+ {
+  if (op.indexOf("*") > -1) { Operacion = 1; };       //codes for *
+  if (op.indexOf("/") > -1) { Operacion = 2; };       // slash (divide)
+  if (op.indexOf("+") > -1) { Operacion = 3; };       // sum
+  if (op.indexOf("-") > -1) { Operacion = 4; };       // difference
 
-  tecla.onclick = mouseClick;
+  Memory = Actual;                 //store value
+  Actual = "";                     //or we could use "0"
+  document.Calculator.display.value = Actual;
+ }
 
-  };
+function Calcular()            //PERFORM CALCULATION (= button)
+ {
+  if (Operacion == 1) { Actual = eval(Memoria) * eval(Actual); };
+  if (Operacion == 2) { Actual = eval(Memoria) / eval(Actual); };
+  if (Operacion == 3) { Actual = eval(Memoria) + eval(Actual); };
+  if (Operacion == 4) { Actual = eval(Memoria) - eval(Actual); };
+  Operacion = 0;                //clear Operacion
+  Memoria    = "0";              //clear Memoria
+  document.Calculator.display.value = Actual;
+ }
+
+function FixActual()
+ {
+  Actual = document.calculadora.display.value;
+  Actual = "" + parseFloat(Actual);
+  if (Actual.indexOf("NaN") != -1)
+    { Actual = "mmmm no te entiendo";
+    };
+  document.calculadora.display.value = Actual;
+ }
+};
